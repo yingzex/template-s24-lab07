@@ -2,6 +2,10 @@ import { CardStatus } from '../../cards/cardstatus.js'
 import { CardOrganizer } from '../cardorganizer.js'
 
 function newRecentMistakesFirstSorter (): CardOrganizer {
+  function lastFailure (cardStatus: CardStatus): number {
+    const results = cardStatus.getResults()
+    return !results[results.length - 1] ? 1 : 0
+  };
   /**
    * Computes the most recent mistake's time stamp for a card and helps in
    * determining the sequence of cards in the next iteration, based on the
@@ -18,7 +22,11 @@ function newRecentMistakesFirstSorter (): CardOrganizer {
      * @return The ordered cards.
      */
     reorganize: function (cards: CardStatus[]): CardStatus[] {
-      return []
+      const c = cards.slice()
+      c.sort((a, b) =>
+        lastFailure(a) > lastFailure(b) ? -1 : (lastFailure(a) < lastFailure(b) ? 1 : 0)
+      )
+      return c
     }
   }
 };
